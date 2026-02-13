@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
+import com.sunpra.incomeexpense.ui.screen.LoginScreen
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -23,7 +24,7 @@ fun AppNavigation() {
         onBack = { backStack.removeLastOrNull() },
         entryProvider = entryProvider {
             entry<LoginRoute> {
-
+                LoginScreen()
             }
 
             entry<RegistrationRoute> {
