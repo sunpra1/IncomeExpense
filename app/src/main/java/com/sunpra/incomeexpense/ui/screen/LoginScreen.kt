@@ -1,5 +1,6 @@
 package com.sunpra.incomeexpense.ui.screen
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -17,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sunpra.incomeexpense.ui.theme.IncomeExpenseTheme
+import com.sunpra.incomeexpense.ui.widget.InputFieldError
 
 @Composable
 fun LoginScreen(
@@ -26,7 +28,7 @@ fun LoginScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     Scaffold() { paddingValues ->
-        Column(modifier = Modifier.padding(paddingValues)) {
+        Column(modifier = Modifier.padding(paddingValues).animateContentSize()) {
             TextField(
                 modifier = Modifier.padding(horizontal = 12.dp)
                     .padding(top = 12.dp)
@@ -49,6 +51,11 @@ fun LoginScreen(
                 onValueChange = viewModel::onEmailChanged
             )
 
+            InputFieldError(
+                modifier = Modifier.padding(horizontal = 12.dp),
+                errorText = uiState.errors["Email"]
+            )
+
             TextField(
                 modifier = Modifier.padding(horizontal = 12.dp)
                     .padding(top = 12.dp)
@@ -69,6 +76,10 @@ fun LoginScreen(
                 },
                 value = uiState.password,
                 onValueChange = viewModel::onPasswordChanged
+            )
+            InputFieldError(
+                modifier = Modifier.padding(horizontal = 12.dp),
+                errorText = uiState.errors["Password"]
             )
 
             Button(

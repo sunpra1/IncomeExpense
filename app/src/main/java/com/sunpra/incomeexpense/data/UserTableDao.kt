@@ -9,11 +9,11 @@ import androidx.room.Update
 interface UserTableDao {
 
     @Query("SELECT * FROM user_table WHERE email = :email AND password = :password LIMIT 1")
-    fun login(email: String, password: String): UserTable?
+    suspend fun login(email: String, password: String): UserTable?
 
     @Insert
-    fun insert(userTable: UserTable)
+    suspend fun insert(userTable: UserTable)
 
     @Update
-    fun update(userTable: UserTable)
+    suspend fun update(userTable: UserTable)
 }
