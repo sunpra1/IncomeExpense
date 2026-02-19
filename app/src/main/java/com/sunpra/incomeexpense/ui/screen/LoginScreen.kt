@@ -19,6 +19,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sunpra.incomeexpense.ui.theme.IncomeExpenseTheme
 import com.sunpra.incomeexpense.ui.widget.InputFieldError
+import com.sunpra.incomeexpense.ui.widget.MessageDialog
 
 @Composable
 fun LoginScreen(
@@ -26,6 +27,7 @@ fun LoginScreen(
 ) {
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val message by viewModel.message.collectAsStateWithLifecycle()
 
     Scaffold() { paddingValues ->
         Column(modifier = Modifier.padding(paddingValues).animateContentSize()) {
@@ -96,6 +98,11 @@ fun LoginScreen(
             }
 
         }
+
+        MessageDialog(
+            message = message,
+            onDismissRequest = viewModel::hideMessage
+        )
     }
 }
 
