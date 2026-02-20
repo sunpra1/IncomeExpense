@@ -8,6 +8,16 @@ class Repository(private val appDatabase: AppDatabase) {
         return userTable
     }
 
+    suspend fun registerUser(userTable: UserTable): Result<UserTable> {
+        val userHavingEmail: UserTable? = appDatabase.getUserTableDao()
+            .getUserByEmail(userTable.email)
 
+        if(userHavingEmail != null){
+            return Result.failure(Exception("Email address already taken."))
+        }else{
+            appDatabase.getUserTableDao().insert(userTable)
+            return Result.success(userTable)
+        }
+    }
 
 }

@@ -11,6 +11,8 @@ interface UserTableDao {
     @Query("SELECT * FROM user_table WHERE email = :email AND password = :password LIMIT 1")
     suspend fun login(email: String, password: String): UserTable?
 
+    @Query("SELECT * FROM user_table WHERE email = :email LIMIT 1")
+    suspend fun getUserByEmail(email: String): UserTable?
     @Insert
     suspend fun insert(userTable: UserTable)
 
