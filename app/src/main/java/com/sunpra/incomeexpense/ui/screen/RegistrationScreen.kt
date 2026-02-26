@@ -1,5 +1,6 @@
 package com.sunpra.incomeexpense.ui.screen
 
+import android.widget.Toast
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -10,8 +11,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -20,14 +23,35 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sunpra.incomeexpense.ui.theme.IncomeExpenseTheme
 import com.sunpra.incomeexpense.ui.widget.InputFieldError
 import com.sunpra.incomeexpense.ui.widget.MessageDialog
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 @Composable
 fun RegistrationScreen(
+    navigateToLogin: () -> Unit,
     viewModel : RegistrationScreenViewModel = viewModel()
 ) {
+    val context = LocalContext.current
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val message by viewModel.message.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) {
+        launch {
+            viewModel.toastMessage.collectLatest { toastMessage ->
+                Toast.makeText(
+                    context,
+                    toastMessage,
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
+        launch {
+            viewModel.navigateLogin.collectLatest {
+                navigateToLogin()
+            }
+        }
+    }
 
     Scaffold() { paddingValues ->
         Column(modifier = Modifier.padding(paddingValues).animateContentSize()) {
@@ -162,6 +186,8 @@ fun RegistrationScreen(
 @Composable
 fun PreviewRegistrationScreen(){
     IncomeExpenseTheme {
-        RegistrationScreen()
+        RegistrationScreen(
+            navigateToLogin = {}
+        )
     }
 }

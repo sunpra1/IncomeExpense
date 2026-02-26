@@ -78,4 +78,6 @@ dependencies {
     implementation(libs.kotlinx.serialization.core)
 
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.10.0")
+
+    implementation("androidx.datastore:datastore-preferences:1.2.0")
 }

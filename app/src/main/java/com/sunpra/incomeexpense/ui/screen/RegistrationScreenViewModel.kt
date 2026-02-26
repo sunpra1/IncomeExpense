@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.UUID
 import java.util.regex.Pattern
 
 class RegistrationScreenViewModel(application: Application) : AndroidViewModel(application) {
@@ -27,6 +28,9 @@ class RegistrationScreenViewModel(application: Application) : AndroidViewModel(a
 
     private val _navigateLogin = MutableSharedFlow<Unit>()
     val navigateLogin = _navigateLogin.asSharedFlow()
+
+    private val _toastMessage = MutableSharedFlow<String>()
+    val toastMessage = _toastMessage.asSharedFlow()
     
     fun onEmailChanged(value: String) {
         _uiState.update { oldState ->
@@ -97,11 +101,24 @@ class RegistrationScreenViewModel(application: Application) : AndroidViewModel(a
     fun onRegisterButtonClicked() {
         if (validate()) {
             val uiState: RegistrationScreenUIState = _uiState.value
+            val id : String = UUID.randomUUID().toString()
+            val fullName : String = uiState.fullName
             val email: String = uiState.email
             val password: String = uiState.password
 
+            val userTable : UserTable = UserTable(id, fullName, email, password)
+
             viewModelScope.launch {
                 // Register logic
+                val result: Result<UserTable> = repository.registerUser(userTable)
+
+                if(result.isFailure){
+                    _message.update { result.exceptionOrNull()?.message }
+                    return@launch
+                }
+
+                _toastMessage.emit("Registration success.")
+                _navigateLogin.emit(Unit)
             }
         }
     }

@@ -6,6 +6,7 @@ import androidx.compose.runtime.remember
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import com.sunpra.incomeexpense.ui.screen.LoginScreen
+import com.sunpra.incomeexpense.ui.screen.RegistrationScreen
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -24,11 +25,20 @@ fun AppNavigation() {
         onBack = { backStack.removeLastOrNull() },
         entryProvider = entryProvider {
             entry<LoginRoute> {
-                LoginScreen()
+                LoginScreen(
+                    navigateToRegister = {
+                        backStack.add(RegistrationRoute)
+                    }
+                )
             }
 
             entry<RegistrationRoute> {
-
+                RegistrationScreen(
+                    navigateToLogin = {
+                        backStack.clear()
+                        backStack.add(LoginRoute)
+                    }
+                )
             }
         }
     )
