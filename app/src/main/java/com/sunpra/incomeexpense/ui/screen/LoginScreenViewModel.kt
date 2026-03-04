@@ -3,8 +3,10 @@ package com.sunpra.incomeexpense.ui.screen
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.sunpra.incomeexpense.data.AppDataStore
 import com.sunpra.incomeexpense.data.AppDatabase
 import com.sunpra.incomeexpense.data.Repository
+import com.sunpra.incomeexpense.data.ServiceProvider
 import com.sunpra.incomeexpense.data.UserTable
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,16 +19,16 @@ import java.util.regex.Pattern
 
 class LoginScreenViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val repository: Repository = Repository(AppDatabase.getInstance(application))
+    private val repository: Repository = Repository(ServiceProvider.tipsService, AppDatabase.getInstance(application))
+    private val dataStore: AppDataStore = AppDataStore(application)
+
+    val loggedInUserId = dataStore.loggedInUserIdFlow()
 
     private val _uiState = MutableStateFlow(LoginScreenUIState())
     val uiState = _uiState.asStateFlow()
 
     private val _message = MutableStateFlow<String?>(null)
     val message = _message.asStateFlow()
-
-    private val _navigateHome = MutableSharedFlow<Unit>()
-    val navigateHome = _navigateHome.asSharedFlow()
     
     fun onEmailChanged(value: String) {
         _uiState.update { oldState ->
@@ -82,14 +84,8 @@ class LoginScreenViewModel(application: Application) : AndroidViewModel(applicat
             viewModelScope.launch {
                 val userTable: UserTable? = repository.login(email = email, password = password)
                 if (userTable != null) {
-                    // Email and password exits
-                    // Navigate to Home screen
-                    // TODO Save user id for home screen
-                    _navigateHome.emit(Unit)
+                    dataStore.saveLoggedInUserId(userTable.id)
                 } else {
-                    // Email and password not available
-                    // Show message
-//                    _message.emit("Invalid email or password.")
                     _message.update { "Invalid email or password." }
                 }
             }

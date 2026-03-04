@@ -5,6 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.sunpra.incomeexpense.data.AppDatabase
 import com.sunpra.incomeexpense.data.Repository
+import com.sunpra.incomeexpense.data.ServiceProvider
 import com.sunpra.incomeexpense.data.UserTable
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,7 +19,7 @@ import java.util.regex.Pattern
 
 class RegistrationScreenViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val repository: Repository = Repository(AppDatabase.getInstance(application))
+    private val repository: Repository = Repository(ServiceProvider.tipsService, AppDatabase.getInstance(application))
 
     private val _uiState = MutableStateFlow(RegistrationScreenUIState())
     val uiState = _uiState.asStateFlow()

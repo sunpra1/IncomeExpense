@@ -3,31 +3,44 @@ package com.sunpra.incomeexpense.ui.screen
 import android.widget.Toast
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.exclude
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.sunpra.incomeexpense.R
 import com.sunpra.incomeexpense.ui.theme.IncomeExpenseTheme
 import com.sunpra.incomeexpense.ui.widget.InputFieldError
 import com.sunpra.incomeexpense.ui.widget.MessageDialog
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegistrationScreen(
+    navigateBack: () -> Unit,
     navigateToLogin: () -> Unit,
     viewModel : RegistrationScreenViewModel = viewModel()
 ) {
@@ -53,7 +66,31 @@ fun RegistrationScreen(
         }
     }
 
-    Scaffold() { paddingValues ->
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                colors = TopAppBarDefaults.topAppBarColors().copy(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary
+                ),
+                navigationIcon = {
+                    IconButton(onClick = navigateBack) {
+                        Icon(
+                            painter = painterResource(R.drawable.chevron_left),
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onPrimary
+                        )
+                    }
+                },
+                title = {
+                    Text(
+                        text = "Registration",
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                }
+            )
+        }
+    ) { paddingValues ->
         Column(modifier = Modifier.padding(paddingValues).animateContentSize()) {
             TextField(
                 modifier = Modifier.padding(horizontal = 12.dp)
@@ -187,7 +224,8 @@ fun RegistrationScreen(
 fun PreviewRegistrationScreen(){
     IncomeExpenseTheme {
         RegistrationScreen(
-            navigateToLogin = {}
+            navigateToLogin = {},
+            navigateBack = {}
         )
     }
 }

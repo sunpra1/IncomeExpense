@@ -2,37 +2,77 @@ package com.sunpra.incomeexpense.ui.screen
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.exclude
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.sunpra.incomeexpense.R
 import com.sunpra.incomeexpense.ui.theme.IncomeExpenseTheme
 import com.sunpra.incomeexpense.ui.widget.InputFieldError
 import com.sunpra.incomeexpense.ui.widget.MessageDialog
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
     navigateToRegister : () -> Unit,
+    navigateToHome : () -> Unit,
     viewModel : LoginScreenViewModel = viewModel()
 ) {
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val message by viewModel.message.collectAsStateWithLifecycle()
 
-    Scaffold() { paddingValues ->
+    LaunchedEffect(Unit) {
+        launch {
+            viewModel.loggedInUserId.filterNotNull().collectLatest {
+                navigateToHome()
+            }
+        }
+    }
+
+    Scaffold (
+        topBar = {
+            TopAppBar(
+                colors = TopAppBarDefaults.topAppBarColors().copy(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary
+                ),
+                title = {
+                    Text(
+                        text = "Login",
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                }
+            )
+        }
+    ){ paddingValues ->
         Column(modifier = Modifier.padding(paddingValues).animateContentSize()) {
             TextField(
                 modifier = Modifier.padding(horizontal = 12.dp)
@@ -125,7 +165,8 @@ fun LoginScreen(
 fun PreviewLoginScreen(){
     IncomeExpenseTheme {
         LoginScreen(
-            navigateToRegister = {}
+            navigateToRegister = {},
+            navigateToHome = {}
         )
     }
 }
