@@ -11,6 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,15 +23,26 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sunpra.incomeexpense.ui.theme.IncomeExpenseTheme
 import com.sunpra.incomeexpense.ui.widget.InputFieldError
 import com.sunpra.incomeexpense.ui.widget.MessageDialog
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(
     navigateToRegister : () -> Unit,
+    navigateToHome: () -> Unit,
     viewModel : LoginScreenViewModel = viewModel()
 ) {
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val message by viewModel.message.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) {
+        launch {
+            viewModel.loggedInUserId.collectLatest {
+                navigateToHome()
+            }
+        }
+    }
 
     Scaffold() { paddingValues ->
         Column(modifier = Modifier.padding(paddingValues).animateContentSize()) {
@@ -125,7 +137,8 @@ fun LoginScreen(
 fun PreviewLoginScreen(){
     IncomeExpenseTheme {
         LoginScreen(
-            navigateToRegister = {}
+            navigateToRegister = {},
+            navigateToHome = {}
         )
     }
 }

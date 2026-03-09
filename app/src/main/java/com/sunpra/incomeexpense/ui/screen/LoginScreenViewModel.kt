@@ -1,22 +1,27 @@
 package com.sunpra.incomeexpense.ui.screen
 
 import android.app.Application
+import androidx.datastore.core.DataStore
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.sunpra.incomeexpense.data.AppDataStore
 import com.sunpra.incomeexpense.data.AppDatabase
 import com.sunpra.incomeexpense.data.Repository
 import com.sunpra.incomeexpense.data.UserTable
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.regex.Pattern
 
 class LoginScreenViewModel(application: Application) : AndroidViewModel(application) {
 
+    private val dataStore : AppDataStore = AppDataStore(context = application)
     private val repository: Repository = Repository(AppDatabase.getInstance(application))
 
     private val _uiState = MutableStateFlow(LoginScreenUIState())
@@ -25,8 +30,7 @@ class LoginScreenViewModel(application: Application) : AndroidViewModel(applicat
     private val _message = MutableStateFlow<String?>(null)
     val message = _message.asStateFlow()
 
-    private val _navigateHome = MutableSharedFlow<Unit>()
-    val navigateHome = _navigateHome.asSharedFlow()
+    val loggedInUserId: Flow<String?> = dataStore.loggedInUserIdFlow().filterNotNull()
     
     fun onEmailChanged(value: String) {
         _uiState.update { oldState ->
@@ -82,14 +86,8 @@ class LoginScreenViewModel(application: Application) : AndroidViewModel(applicat
             viewModelScope.launch {
                 val userTable: UserTable? = repository.login(email = email, password = password)
                 if (userTable != null) {
-                    // Email and password exits
-                    // Navigate to Home screen
-                    // TODO Save user id for home screen
-                    _navigateHome.emit(Unit)
+                    dataStore.saveLoggedInUserId(userTable.id)
                 } else {
-                    // Email and password not available
-                    // Show message
-//                    _message.emit("Invalid email or password.")
                     _message.update { "Invalid email or password." }
                 }
             }
