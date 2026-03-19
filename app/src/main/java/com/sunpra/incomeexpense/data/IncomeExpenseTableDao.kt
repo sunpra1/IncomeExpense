@@ -15,6 +15,6 @@ interface IncomeExpenseTableDao {
     suspend fun update(incomeExpenseTable: IncomeExpenseTable)
 
     @Delete
-    fun delete(incomeExpenseTable: IncomeExpenseTable)
+    suspend fun delete(incomeExpenseTable: IncomeExpenseTable)
 
 }

@@ -4,8 +4,10 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 
-@Database(entities = [UserTable::class, IncomeExpenseTable::class], version = 1)
+@Database(entities = [UserTable::class, IncomeExpenseTable::class], version = 2)
 abstract class AppDatabase : RoomDatabase() {
 
     companion object {
@@ -19,7 +21,9 @@ abstract class AppDatabase : RoomDatabase() {
                     context,
                     AppDatabase::class.java,
                     "app_database"
-                ).build()
+                )
+                    .addMigrations(MIGRATION_1_2)
+                    .build()
                     .also { instance = it }
             }
         }
@@ -29,4 +33,10 @@ abstract class AppDatabase : RoomDatabase() {
 
     abstract fun getIncomeOrExpenseTableDao(): IncomeExpenseTableDao
 
+}
+
+val MIGRATION_1_2 = object : Migration(1, 2) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE income_expense_table ADD COLUMN date_created INTEGER NOT NULL DEFAULT 0")
+    }
 }

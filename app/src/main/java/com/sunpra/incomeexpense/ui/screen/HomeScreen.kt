@@ -33,6 +33,9 @@ data object HealthTipRoute
 @Serializable
 data object SettingRoute
 
+@Serializable
+data object AddOrUpdateIncomeExpenseRoute
+
 @Composable
 fun HomeScreen() {
 
@@ -46,12 +49,18 @@ fun HomeScreen() {
             onBack = { backStack.removeLastOrNull() },
             entryProvider = entryProvider {
                 entry<InnerHomeRoute> {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center) {
-
-                        Text( text = "This is Home screen.")
-                    }
+                    InnerHomeScreen(
+                        navigateToAddOrUpdateIncomeOrExpenseScreen = {
+                            backStack.add(AddOrUpdateIncomeExpenseRoute)
+                        }
+                    )
+                }
+                entry<AddOrUpdateIncomeExpenseRoute> {
+                    AddOrUpdateIncomeOrExpenseScreen(
+                        navigateToHomeScreen = {
+                            backStack.removeLastOrNull()
+                        }
+                    )
                 }
                 entry<HealthTipRoute> {
                     Box(

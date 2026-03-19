@@ -33,6 +33,8 @@ data class IncomeExpenseTable(
     val expenseType: ExpenseType?, // CalorieBurnType
     @ColumnInfo(name = "note")
     val note: String?,
+    @ColumnInfo(name = "date_created")
+    val dateCreated: Long,
     @ColumnInfo(name = "user_id")
     val userId: String
 )

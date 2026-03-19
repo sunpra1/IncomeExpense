@@ -2,7 +2,7 @@ package com.sunpra.incomeexpense.data
 
 class Repository(private val appDatabase: AppDatabase) {
 
-    suspend fun login(email: String, password: String) : UserTable? {
+    suspend fun login(email: String, password: String): UserTable? {
         val userTableDao = appDatabase.getUserTableDao()
         val userTable = userTableDao.login(email, password)
         return userTable
@@ -12,12 +12,25 @@ class Repository(private val appDatabase: AppDatabase) {
         val userHavingEmail: UserTable? = appDatabase.getUserTableDao()
             .getUserByEmail(userTable.email)
 
-        if(userHavingEmail != null){
+        if (userHavingEmail != null) {
             return Result.failure(Exception("Email address already taken."))
-        }else{
+        } else {
             appDatabase.getUserTableDao().insert(userTable)
             return Result.success(userTable)
         }
     }
+
+    suspend fun addIncomeOrExpenseInTable(incomeExpenseTable: IncomeExpenseTable) {
+        appDatabase.getIncomeOrExpenseTableDao().insert(incomeExpenseTable)
+    }
+
+    suspend fun deleteIncomeExpense(incomeExpenseTable: IncomeExpenseTable) {
+        appDatabase.getIncomeOrExpenseTableDao().delete(incomeExpenseTable)
+    }
+
+    suspend fun updateIncomeExpense(incomeExpenseTable: IncomeExpenseTable){
+        appDatabase.getIncomeOrExpenseTableDao().update(incomeExpenseTable)
+    }
+
 
 }
