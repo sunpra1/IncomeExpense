@@ -13,6 +13,10 @@ interface UserTableDao {
 
     @Query("SELECT * FROM user_table WHERE email = :email LIMIT 1")
     suspend fun getUserByEmail(email: String): UserTable?
+
+    @Query("SELECT * FROM user_table WHERE id = :id LIMIT 1")
+    suspend fun getUserById(id: String): UserTable?
+
     @Insert
     suspend fun insert(userTable: UserTable)
 

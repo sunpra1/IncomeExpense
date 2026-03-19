@@ -1,5 +1,7 @@
 package com.sunpra.incomeexpense.data
 
+import kotlinx.coroutines.flow.Flow
+
 class Repository(private val appDatabase: AppDatabase) {
 
     suspend fun login(email: String, password: String): UserTable? {
@@ -32,5 +34,12 @@ class Repository(private val appDatabase: AppDatabase) {
         appDatabase.getIncomeOrExpenseTableDao().update(incomeExpenseTable)
     }
 
+    fun getAllIncomeExpense(userId: String): Flow<List<IncomeExpenseTable>> {
+        return appDatabase.getIncomeOrExpenseTableDao().getAll(userId)
+    }
+
+    suspend fun getUserById(userId: String): UserTable? {
+        return appDatabase.getUserTableDao().getUserById(userId)
+    }
 
 }
