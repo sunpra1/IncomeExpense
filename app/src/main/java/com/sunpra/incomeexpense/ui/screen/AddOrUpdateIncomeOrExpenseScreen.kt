@@ -1,5 +1,6 @@
 package com.sunpra.incomeexpense.ui.screen
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
@@ -24,6 +25,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -69,13 +71,24 @@ fun AddOrUpdateIncomeOrExpenseScreen(
         }
     }
 
+    BackHandler(onBack = navigateToHomeScreen)
+
     Scaffold(
         topBar = {
             TopAppBar(
+                navigationIcon = {
+
+                    IconButton(
+                        onClick = navigateToHomeScreen
+                    ) {
+                        Text("Back")
+                    }
+                },
                 colors = TopAppBarDefaults.topAppBarColors()
                     .copy(
                         containerColor = MaterialTheme.colorScheme.primary,
-                        titleContentColor = MaterialTheme.colorScheme.onPrimary
+                        titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                        navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
                     ),
                 title = {
                     Text(
