@@ -31,6 +31,22 @@ class AddOrUpdateIncomeOrExpenseScreenViewModel(application: Application) :
     private val _navigateToHomeScreen = MutableSharedFlow<Unit>()
     val navigateToHomeScreen = _navigateToHomeScreen.asSharedFlow()
 
+    fun setIncomeExpenseTableToBeUpdated(incomeExpenseTable: IncomeExpenseTable?){
+        incomeExpenseTable ?: return
+        _uiState.update { state ->
+            state.copy(
+                id = incomeExpenseTable.id,
+                incomeOrExpense = incomeExpenseTable.incomeOrExpense,
+                name =  incomeExpenseTable.name,
+                amount = incomeExpenseTable.amount.toString(),
+                incomeType = incomeExpenseTable.incomeType,
+                expenseType = incomeExpenseTable.expenseType,
+                note = incomeExpenseTable.note ?: "",
+                dateCreated = incomeExpenseTable.dateCreated
+            )
+        }
+    }
+
     fun onIncomeExpenseSelected(incomeOrExpense: IncomeOrExpense) {
         _uiState.update { oldState ->
             oldState.copy(
@@ -95,14 +111,16 @@ class AddOrUpdateIncomeOrExpenseScreenViewModel(application: Application) :
         // TODO validate
         val uiState = _uiState.value
 
-        val id = UUID.randomUUID().toString()
+        val isAdd = uiState.id == null
+
+        val id = uiState.id ?: UUID.randomUUID().toString()
         val incomeOrExpense = uiState.incomeOrExpense
         val name = uiState.name
         val amount = uiState.amount.toDouble()
         val incomeType = uiState.incomeType
         val expenseType = uiState.expenseType
         val note = uiState.note.takeIf { it.isNotEmpty() }
-        val dateCreated = Calendar.getInstance().timeInMillis
+        val dateCreated = uiState.dateCreated ?: Calendar.getInstance().timeInMillis
 
         viewModelScope.launch {
             val userId = dataStore.loggedInUserIdFlow().first() ?: return@launch
@@ -112,7 +130,12 @@ class AddOrUpdateIncomeOrExpenseScreenViewModel(application: Application) :
                 expenseType, note, dateCreated, userId
             )
 
-            repository.addIncomeOrExpenseInTable(incomeExpenseTable)
+            if(isAdd){
+                repository.addIncomeOrExpenseInTable(incomeExpenseTable)
+            }else{
+                repository.updateIncomeExpense(incomeExpenseTable)
+            }
+
             _uiState.update {
                 AddOrUpdateIncomeOrExpenseScreenUIState()
             }
@@ -122,6 +145,7 @@ class AddOrUpdateIncomeOrExpenseScreenViewModel(application: Application) :
 }
 
 data class AddOrUpdateIncomeOrExpenseScreenUIState(
+    val id: String? = null,
     val incomeOrExpense: IncomeOrExpense = IncomeOrExpense.Income,
     val name: String = "",
     val amount: String = "",
@@ -130,5 +154,6 @@ data class AddOrUpdateIncomeOrExpenseScreenUIState(
     val expenseType: ExpenseType? = null,
     val showExpenseTypeDropdown: Boolean = false,
     val note: String = "",
+    val dateCreated: Long? = null,
     val errors: Map<String, String> = mapOf()
 )

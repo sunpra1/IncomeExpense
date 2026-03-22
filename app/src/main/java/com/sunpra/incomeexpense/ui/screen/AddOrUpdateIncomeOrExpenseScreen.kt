@@ -47,6 +47,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sunpra.incomeexpense.R
 import com.sunpra.incomeexpense.data.ExpenseType
+import com.sunpra.incomeexpense.data.IncomeExpenseTable
 import com.sunpra.incomeexpense.data.IncomeOrExpense
 import com.sunpra.incomeexpense.data.IncomeType
 import com.sunpra.incomeexpense.ui.widget.InputFieldError
@@ -57,6 +58,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddOrUpdateIncomeOrExpenseScreen(
+    incomeExpenseTable: IncomeExpenseTable?,
     navigateToHomeScreen: () -> Unit,
     viewModel: AddOrUpdateIncomeOrExpenseScreenViewModel = viewModel()
 ) {
@@ -64,6 +66,9 @@ fun AddOrUpdateIncomeOrExpenseScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
+        launch {
+            viewModel.setIncomeExpenseTableToBeUpdated(incomeExpenseTable)
+        }
         launch {
             viewModel.navigateToHomeScreen.collectLatest {
                 navigateToHomeScreen()

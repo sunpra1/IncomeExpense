@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
@@ -25,6 +27,10 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -33,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sunpra.incomeexpense.R
+import com.sunpra.incomeexpense.data.IncomeExpenseTable
 import com.sunpra.incomeexpense.model.TimeFilterOption
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -40,12 +47,12 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InnerHomeScreen(
-    navigateToAddOrUpdateIncomeOrExpenseScreen: () -> Unit,
+    navigateToAddOrUpdateIncomeOrExpenseScreen: (IncomeExpenseTable?) -> Unit,
     viewModel: InnerHomeScreenViewModel = viewModel()
 ) {
 
     val user by viewModel.user.collectAsStateWithLifecycle()
-    val incomeAndExpenses by viewModel.incomeAndExpenses.collectAsStateWithLifecycle()
+    val incomeAndExpenses by viewModel.filteredList.collectAsStateWithLifecycle()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     Scaffold(
@@ -65,7 +72,7 @@ fun InnerHomeScreen(
                 },
                 actions = {
                     IconButton(
-                        onClick = navigateToAddOrUpdateIncomeOrExpenseScreen
+                        onClick = { navigateToAddOrUpdateIncomeOrExpenseScreen(null) }
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.plus),
@@ -82,7 +89,8 @@ fun InnerHomeScreen(
 
             Column(modifier = Modifier.fillMaxSize()) {
                 FlowRow(
-                    modifier = Modifier.padding(horizontal = 12.dp)
+                    modifier = Modifier
+                        .padding(horizontal = 12.dp)
                         .padding(top = 12.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalArrangement = Arrangement.Center
@@ -114,44 +122,86 @@ fun InnerHomeScreen(
                 }
 
                 LazyColumn(
-                    modifier = Modifier.fillMaxWidth().weight(1f),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
                     contentPadding = PaddingValues(12.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     items(incomeAndExpenses) { item ->
-                        Column {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Text(
-                                    modifier = Modifier.weight(1f),
-                                    text = item.incomeOrExpense.name,
-                                    style = MaterialTheme.typography.bodyMedium
-                                )
 
+                        var showDropDown by remember { mutableStateOf(false) }
+
+                        Row {
+                            Column(modifier = Modifier.weight(1f)) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Text(
+                                        modifier = Modifier.weight(1f),
+                                        text = item.incomeOrExpense.name,
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+
+                                    Text(
+                                        text = getReadableDateFromMillis(item.dateCreated),
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+                                }
                                 Text(
-                                    text = getReadableDateFromMillis(item.dateCreated),
-                                    style = MaterialTheme.typography.bodyMedium
+                                    text = item.name,
+                                    style = MaterialTheme.typography.titleLarge
                                 )
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Text(
+                                        text = "NRs. ${item.amount}",
+                                        style = MaterialTheme.typography.labelMedium
+                                    )
+                                    Text(
+                                        text = item.incomeType?.name ?: item.expenseType?.name
+                                        ?: "",
+                                        style = MaterialTheme.typography.labelMedium
+                                    )
+                                }
                             }
-                            Text(
-                                text = item.name,
-                                style = MaterialTheme.typography.titleLarge
-                            )
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Text(
-                                    text = "NRs. ${item.amount}",
-                                    style = MaterialTheme.typography.labelMedium
-                                )
-                                Text(
-                                    text = item.incomeType?.name ?: item.expenseType?.name ?: "",
-                                    style = MaterialTheme.typography.labelMedium
-                                )
+
+
+                            Column {
+                                IconButton(
+                                    onClick = { showDropDown = showDropDown.not() }
+                                ) {
+                                    Icon(
+                                        painter = painterResource(R.drawable.dots_vertical),
+                                        contentDescription = null
+                                    )
+                                }
+
+                                DropdownMenu(
+                                    expanded = showDropDown,
+                                    onDismissRequest = { showDropDown = showDropDown.not() }
+                                ){
+                                    DropdownMenuItem(
+                                        text = { Text("Delete") },
+                                        onClick = {
+                                            viewModel.onDeleteClick(item)
+                                        }
+                                    )
+
+                                    DropdownMenuItem(
+                                        text = { Text("Edit") },
+                                        onClick = {
+                                            showDropDown = showDropDown.not()
+                                            navigateToAddOrUpdateIncomeOrExpenseScreen(item)
+                                        }
+                                    )
+                                }
                             }
+
+
                         }
                     }
                 }

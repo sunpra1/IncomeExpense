@@ -33,6 +33,7 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.window.core.layout.WindowSizeClass.Companion.WIDTH_DP_MEDIUM_LOWER_BOUND
 import com.sunpra.incomeexpense.R
+import com.sunpra.incomeexpense.data.IncomeExpenseTable
 import com.sunpra.incomeexpense.ui.navigation.HomeRoute
 import com.sunpra.incomeexpense.ui.navigation.LoginRoute
 import com.sunpra.incomeexpense.ui.navigation.RegistrationRoute
@@ -48,7 +49,7 @@ data object HealthTipRoute: NavKey
 data object SettingRoute: NavKey
 
 @Serializable
-data object AddOrUpdateIncomeExpenseRoute: NavKey
+data class AddOrUpdateIncomeExpenseRoute(val incomeOrExpenseTable: IncomeExpenseTable?): NavKey
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
@@ -157,7 +158,7 @@ fun HomeScreen() {
                     ) {
                         InnerHomeScreen(
                             navigateToAddOrUpdateIncomeOrExpenseScreen = {
-                                backStack.add(AddOrUpdateIncomeExpenseRoute)
+                                backStack.add(AddOrUpdateIncomeExpenseRoute(it))
                             }
                         )
                     }
@@ -165,6 +166,7 @@ fun HomeScreen() {
                         metadata = ListDetailSceneStrategy.detailPane()
                     ) {
                         AddOrUpdateIncomeOrExpenseScreen(
+                            incomeExpenseTable = it.incomeOrExpenseTable,
                             navigateToHomeScreen = {
                                 backStack.removeLastOrNull()
                             }

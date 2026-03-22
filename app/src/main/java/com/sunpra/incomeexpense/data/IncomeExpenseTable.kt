@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
+import kotlinx.serialization.Serializable
 
 // CalorieBurnOrIntake
 @Entity(
@@ -17,6 +18,7 @@ import androidx.room.PrimaryKey
         )
     ]
 )
+@Serializable
 data class IncomeExpenseTable(
     @PrimaryKey
     @ColumnInfo(name = "id")
