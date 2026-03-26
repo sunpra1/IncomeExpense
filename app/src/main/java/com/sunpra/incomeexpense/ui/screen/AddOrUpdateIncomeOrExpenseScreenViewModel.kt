@@ -47,6 +47,10 @@ class AddOrUpdateIncomeOrExpenseScreenViewModel(application: Application) :
         }
     }
 
+    fun resetState(){
+        _uiState.update { AddOrUpdateIncomeOrExpenseScreenUIState() }
+    }
+
     fun onIncomeExpenseSelected(incomeOrExpense: IncomeOrExpense) {
         _uiState.update { oldState ->
             oldState.copy(

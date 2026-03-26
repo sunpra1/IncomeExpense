@@ -76,7 +76,13 @@ fun AddOrUpdateIncomeOrExpenseScreen(
         }
     }
 
-    BackHandler(onBack = navigateToHomeScreen)
+    BackHandler(
+        onBack = {
+            viewModel.resetState().also {
+                navigateToHomeScreen()
+            }
+        }
+    )
 
     Scaffold(
         topBar = {
@@ -84,7 +90,11 @@ fun AddOrUpdateIncomeOrExpenseScreen(
                 navigationIcon = {
 
                     IconButton(
-                        onClick = navigateToHomeScreen
+                        onClick = {
+                            viewModel.resetState().also {
+                                navigateToHomeScreen()
+                            }
+                        }
                     ) {
                         Text("Back")
                     }
@@ -97,7 +107,7 @@ fun AddOrUpdateIncomeOrExpenseScreen(
                     ),
                 title = {
                     Text(
-                        text = "Add Income Expense",
+                        text = if (incomeExpenseTable != null) "Update Income Expense" else "Add Income Expense",
                         style = MaterialTheme.typography.titleLarge
                             .copy(color = MaterialTheme.colorScheme.onPrimary)
                     )

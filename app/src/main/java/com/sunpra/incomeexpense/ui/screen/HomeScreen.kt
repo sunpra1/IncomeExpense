@@ -20,7 +20,6 @@ import androidx.compose.material3.adaptive.navigation3.rememberListDetailSceneSt
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,22 +33,19 @@ import androidx.navigation3.ui.NavDisplay
 import androidx.window.core.layout.WindowSizeClass.Companion.WIDTH_DP_MEDIUM_LOWER_BOUND
 import com.sunpra.incomeexpense.R
 import com.sunpra.incomeexpense.data.IncomeExpenseTable
-import com.sunpra.incomeexpense.ui.navigation.HomeRoute
-import com.sunpra.incomeexpense.ui.navigation.LoginRoute
-import com.sunpra.incomeexpense.ui.navigation.RegistrationRoute
 import kotlinx.serialization.Serializable
 
 @Serializable
 data object InnerHomeRoute : NavKey
 
 @Serializable
-data object HealthTipRoute: NavKey
+data object HealthTipRoute : NavKey
 
 @Serializable
-data object SettingRoute: NavKey
+data object SettingRoute : NavKey
 
 @Serializable
-data class AddOrUpdateIncomeExpenseRoute(val incomeOrExpenseTable: IncomeExpenseTable?): NavKey
+data class AddOrUpdateIncomeExpenseRoute(val incomeOrExpenseTable: IncomeExpenseTable?) : NavKey
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
@@ -136,7 +132,9 @@ fun HomeScreen() {
             }
         }
 
-        Column(modifier = Modifier.fillMaxSize().weight(1f)) {
+        Column(modifier = Modifier
+            .fillMaxSize()
+            .weight(1f)) {
 
             NavDisplay(
                 modifier = Modifier
@@ -152,7 +150,15 @@ fun HomeScreen() {
                     entry<InnerHomeRoute>(
                         metadata = ListDetailSceneStrategy.listPane(
                             detailPlaceholder = {
-                                Box(modifier = Modifier.fillMaxSize())
+                                Box(
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        "Please add/update new income expense.",
+                                        style = MaterialTheme.typography.titleLarge
+                                    )
+                                }
                             }
                         )
                     ) {
